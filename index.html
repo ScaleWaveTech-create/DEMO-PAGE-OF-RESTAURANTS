@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>ScaleWave Feedback System — For Premium Restaurants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:          #020B18;
+  --surface:     rgba(3,14,32,0.90);
+  --amber:       #FF9500;
+  --amber-light: #FFB347;
+  --amber-deep:  #E07800;
+  --cream:       #FFF8EE;
+  --cream-dim:   #C8B89A;
+  --red-alert:   #FF4444;
+  --green-go:    #00D084;
+  --blue-trust:  #4A9EFF;
+  --font-display:'Playfair Display', Georgia, serif;
+  --font-body:   'Sora', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;scroll-behavior:smooth}
+body{min-height:100%;background:var(--bg);font-family:var(--font-body);color:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+/* ── BG ── */
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.bg-layer::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(74,158,255,0.07) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(255,149,0,0.08) 0%,transparent 60%);}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);pointer-events:none;}
+.orb-1{width:700px;height:700px;background:rgba(74,158,255,0.07);top:-250px;left:-200px;animation:driftA 20s ease-in-out infinite alternate;}
+.orb-2{width:600px;height:600px;background:rgba(255,149,0,0.09);bottom:-200px;right:-150px;animation:driftB 16s ease-in-out infinite alternate;}
+.orb-3{width:400px;height:400px;background:rgba(255,68,68,0.04);top:40%;left:30%;animation:driftA 24s ease-in-out infinite alternate-reverse;}
+@keyframes driftA{0%{transform:translate(0,0) scale(1);}100%{transform:translate(50px,40px) scale(1.1);}}
+@keyframes driftB{0%{transform:translate(0,0) scale(1);}100%{transform:translate(-40px,-30px) scale(1.08);}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(74,158,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(74,158,255,0.025) 1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(ellipse 90% 90% at 50% 50%,black 20%,transparent 100%);}
+#pc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.6;}
+
+/* ── ALERT BAR ── */
+.alert-bar{
+  position:relative;z-index:10;
+  background:linear-gradient(90deg,#8B1A1A,#C0392B,#8B1A1A);
+  background-size:200% 100%;
+  animation:alertPulse 3s ease infinite;
+  padding:10px 20px;
+  display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;
+  color:#FFE0E0;text-align:center;
+}
+.alert-warn{font-size:14px;animation:shake 2s ease infinite;flex-shrink:0;}
+#alertCountSpan{font-weight:800;color:#FF9090;font-variant-numeric:tabular-nums;}
+#alertTextSpan{color:#FFE0E0;}
+@keyframes alertPulse{0%,100%{background-position:0%}50%{background-position:100%}}
+@keyframes shake{0%,90%,100%{transform:rotate(0)}92%{transform:rotate(-8deg)}96%{transform:rotate(8deg)}}
+
+/* ── LAYOUT ── */
+.page{position:relative;z-index:1;min-height:calc(100vh - 44px);display:flex;flex-direction:column;align-items:center;padding:40px 20px 60px;}
+
+/* ── LOGO ── */
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:36px;opacity:0;animation:fadeUp 0.5s ease 0.1s forwards;}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--amber),var(--amber-light));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 20px rgba(255,149,0,0.40),0 4px 12px rgba(0,0,0,0.3);}
+.logo-text{font-size:13px;font-weight:700;letter-spacing:0.06em;color:var(--cream-dim);}
+.logo-text span{color:var(--amber);text-shadow:0 0 12px rgba(255,149,0,0.6);}
+
+/* ── HERO ── */
+.hero{text-align:center;max-width:480px;width:100%;margin-bottom:36px;opacity:0;animation:fadeUp 0.7s ease 0.2s forwards;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.25);border-radius:100px;padding:6px 16px;font-size:10.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber-light);margin-bottom:22px;box-shadow:0 0 20px rgba(255,149,0,0.10);}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber),0 0 16px var(--amber);animation:pulseDot 2s ease infinite;}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+.hero-pain{font-size:clamp(13px,3.5vw,15px);font-weight:500;color:var(--red-alert);margin-bottom:14px;letter-spacing:0.01em;line-height:1.5;text-shadow:0 0 20px rgba(255,68,68,0.4);display:flex;align-items:center;justify-content:center;gap:7px;}
+.pain-icon{animation:shake 2.5s ease infinite;}
+#heroPainText{display:inline;}
+.hero-headline{font-family:var(--font-display);font-size:clamp(30px,8.5vw,46px);font-weight:700;line-height:1.12;margin-bottom:18px;background:linear-gradient(135deg,#FFFFFF 0%,#FFE5B8 45%,#FFFFFF 70%,#B8D8FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 20px rgba(255,149,0,0.20));}
+.hero-headline em{font-style:italic;-webkit-text-fill-color:transparent;background:linear-gradient(135deg,var(--amber),var(--amber-light));-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 16px rgba(255,149,0,0.5));}
+.hero-sub{font-size:14.5px;font-weight:300;line-height:1.72;color:var(--cream-dim);}
+.hero-sub strong{color:var(--cream);font-weight:600;}
+
+/* ── STATS ── */
+.stats-row{display:flex;align-items:stretch;gap:12px;width:100%;max-width:480px;margin-bottom:28px;opacity:0;animation:fadeUp 0.6s ease 0.35s forwards;}
+.stat-card{flex:1;background:rgba(255,255,255,0.03);border-radius:18px;padding:18px 12px;text-align:center;border:1px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.stat-card.amber::before{background:linear-gradient(90deg,transparent,var(--amber),transparent);box-shadow:0 0 10px var(--amber);}
+.stat-card.red::before{background:linear-gradient(90deg,transparent,var(--red-alert),transparent);box-shadow:0 0 10px var(--red-alert);}
+.stat-card.green::before{background:linear-gradient(90deg,transparent,var(--green-go),transparent);box-shadow:0 0 10px var(--green-go);}
+.stat-num{font-size:26px;font-weight:800;line-height:1;margin-bottom:5px;font-variant-numeric:tabular-nums;}
+.stat-card.amber .stat-num{color:var(--amber);text-shadow:0 0 16px rgba(255,149,0,0.6);}
+.stat-card.red    .stat-num{color:var(--red-alert);text-shadow:0 0 16px rgba(255,68,68,0.6);}
+.stat-card.green  .stat-num{color:var(--green-go);text-shadow:0 0 16px rgba(0,208,132,0.6);}
+.stat-label{font-size:10px;font-weight:500;color:var(--cream-dim);letter-spacing:0.04em;line-height:1.4;}
+
+/* ── MAIN CARD ── */
+.main-card{width:100%;max-width:480px;background:var(--surface);border:1px solid rgba(255,149,0,0.22);border-radius:28px;padding:36px 28px;position:relative;overflow:hidden;backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);box-shadow:0 0 0 1px rgba(255,149,0,0.06),0 40px 100px rgba(0,0,0,0.65),0 0 60px rgba(255,149,0,0.07),inset 0 1px 0 rgba(255,149,0,0.14);opacity:0;animation:fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.45s forwards;}
+.main-card::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1.5px;background:linear-gradient(90deg,transparent,var(--amber),rgba(255,179,71,0.6),var(--amber),transparent);box-shadow:0 0 14px rgba(255,149,0,0.5);}
+.main-card::after{content:'';position:absolute;inset:0;border-radius:28px;pointer-events:none;background:radial-gradient(ellipse 70% 35% at 50% 0%,rgba(255,149,0,0.05),transparent);}
+.section-label{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:24px;text-shadow:0 0 10px rgba(255,149,0,0.5);}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,149,0,0.3),transparent);}
+.preview-icon{font-size:44px;text-align:center;display:block;margin-bottom:14px;filter:drop-shadow(0 0 14px rgba(255,149,0,0.5));animation:iconFloat 3.5s ease-in-out infinite;}
+@keyframes iconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.preview-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:14px;text-align:center;}
+.preview-headline{font-family:var(--font-display);font-size:clamp(20px,5.5vw,26px);font-weight:700;text-align:center;line-height:1.25;margin-bottom:10px;background:linear-gradient(135deg,#FFF,#FFE5B8 50%,#FFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.preview-heart{-webkit-text-fill-color:#FF6B9D;text-shadow:0 0 14px rgba(255,107,157,0.7);display:inline-block;animation:hb 2s ease infinite;}
+@keyframes hb{0%,100%{transform:scale(1)}14%{transform:scale(1.28)}28%{transform:scale(1)}42%{transform:scale(1.15)}56%{transform:scale(1)}}
+.preview-sub{text-align:center;font-size:13px;font-weight:300;color:var(--cream-dim);margin-bottom:24px;line-height:1.6;}
+.preview-sub strong{color:var(--cream);font-weight:600;}
+.preview-btns{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.pbtn{display:flex;align-items:center;gap:11px;padding:17px 20px;border-radius:15px;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:default;position:relative;overflow:hidden;}
+.pbtn-happy{background:linear-gradient(135deg,rgba(255,149,0,0.12),rgba(255,179,71,0.08));border:1.5px solid rgba(255,149,0,0.40);color:var(--amber-light);box-shadow:0 0 18px rgba(255,149,0,0.12),inset 0 1px 0 rgba(255,149,0,0.12);}
+.pbtn-happy .pbl-main{text-shadow:0 0 10px rgba(255,149,0,0.7);}
+.pbtn-unhappy{background:linear-gradient(135deg,rgba(0,208,132,0.07),rgba(0,208,132,0.04));border:1.5px solid rgba(0,208,132,0.28);color:#7EEFC8;box-shadow:0 0 14px rgba(0,208,132,0.08),inset 0 1px 0 rgba(0,208,132,0.08);}
+.pbtn-unhappy .pbl-main{text-shadow:0 0 10px rgba(0,208,132,0.7);}
+.pbtn-emoji{font-size:20px;line-height:1;flex-shrink:0;}
+.pbtn-labels{display:flex;flex-direction:column;gap:2px;}
+.pbl-main{font-size:14px;font-weight:700;}
+.pbl-sub{font-size:10.5px;font-weight:400;opacity:0.60;letter-spacing:0.03em;}
+.mini-trust{display:flex;align-items:center;justify-content:center;gap:16px;padding-top:18px;border-top:1px solid rgba(255,149,0,0.08);}
+.mini-trust-item{font-size:10.5px;color:var(--cream-dim);display:flex;align-items:center;gap:4px;}
+
+/* ── FEATURES ── */
+.features{width:100%;max-width:480px;margin-top:24px;display:flex;flex-direction:column;gap:10px;opacity:0;animation:fadeUp 0.6s ease 0.6s forwards;}
+.feature-item{display:flex;align-items:flex-start;gap:13px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:16px 18px;transition:border-color 0.2s,background 0.2s,transform 0.2s;}
+.feature-item:hover{background:rgba(255,149,0,0.05);border-color:rgba(255,149,0,0.18);transform:translateX(4px);}
+.fi-icon{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.fi-icon.amber{background:rgba(255,149,0,0.12);box-shadow:0 0 14px rgba(255,149,0,0.15);}
+.fi-icon.blue{background:rgba(74,158,255,0.12);box-shadow:0 0 14px rgba(74,158,255,0.15);}
+.fi-icon.green{background:rgba(0,208,132,0.12);box-shadow:0 0 14px rgba(0,208,132,0.15);}
+.fi-icon.red{background:rgba(255,68,68,0.10);box-shadow:0 0 14px rgba(255,68,68,0.10);}
+.fi-title{font-size:13.5px;font-weight:700;color:var(--cream);margin-bottom:3px;}
+.fi-desc{font-size:12px;font-weight:300;color:var(--cream-dim);line-height:1.55;}
+
+/* ── TESTIMONIAL ── */
+.testimonial{width:100%;max-width:480px;margin-top:20px;background:rgba(255,149,0,0.05);border:1px solid rgba(255,149,0,0.15);border-radius:20px;padding:22px;opacity:0;animation:fadeUp 0.6s ease 0.7s forwards;}
+.testi-stars{font-size:14px;letter-spacing:2px;color:var(--amber);margin-bottom:10px;text-shadow:0 0 10px rgba(255,149,0,0.5);}
+.testi-quote{font-family:var(--font-display);font-style:italic;font-size:15px;line-height:1.65;color:var(--cream);margin-bottom:14px;}
+.testi-author{display:flex;align-items:center;gap:10px;}
+.testi-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--amber-light));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1A0A00;flex-shrink:0;box-shadow:0 0 12px rgba(255,149,0,0.35);}
+.testi-name{font-size:13px;font-weight:600;color:var(--cream);}
+.testi-role{font-size:11px;color:var(--cream-dim);}
+
+/* ── CTA BLOCK ── */
+.cta-block{width:100%;max-width:480px;margin-top:28px;text-align:center;opacity:0;animation:fadeUp 0.7s ease 0.8s forwards;}
+.cta-urgency{font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--red-alert);margin-bottom:16px;text-shadow:0 0 14px rgba(255,68,68,0.5);display:flex;align-items:center;justify-content:center;gap:6px;animation:urgencyPulse 2s ease infinite;}
+@keyframes urgencyPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.cta-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:22px 28px;border-radius:20px;background:linear-gradient(135deg,#E07800,#FF9500,#FFB347,#FF9500,#E07800);background-size:300% 100%;border:none;cursor:pointer;text-decoration:none;font-family:var(--font-body);font-size:17px;font-weight:800;color:#1A0800;letter-spacing:0.02em;box-shadow:0 0 30px rgba(255,149,0,0.45),0 0 60px rgba(255,149,0,0.20),0 12px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.20);animation:ctaShimmer 3s ease infinite;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.cta-btn-shine{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.20),transparent);animation:shineSweep 3s ease infinite 1s;}
+@keyframes shineSweep{0%,70%{left:-100%}85%{left:150%}100%{left:150%}}
+@keyframes ctaShimmer{0%,100%{background-position:0%}50%{background-position:100%}}
+.cta-btn:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 0 50px rgba(255,149,0,0.65),0 0 100px rgba(255,149,0,0.25),0 20px 50px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.25);}
+.cta-btn:active{transform:scale(0.97)!important;}
+.cta-btn-icon{font-size:22px;line-height:1;}
+.cta-btn-text{display:flex;flex-direction:column;align-items:flex-start;gap:1px;}
+.cta-btn-main{font-size:17px;font-weight:800;letter-spacing:0.01em;}
+.cta-btn-sub{font-size:11px;font-weight:500;opacity:0.75;}
+.cta-subtext{margin-top:12px;font-size:11.5px;color:var(--cream-dim);display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;}
+.cta-subtext span{display:flex;align-items:center;gap:4px;}
+
+/* ── FOOTER ── */
+.footer{margin-top:36px;text-align:center;font-size:11px;color:rgba(200,184,154,0.30);letter-spacing:0.05em;opacity:0;animation:fadeUp 0.5s ease 1s forwards;}
+.footer span{color:rgba(255,149,0,0.40);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+
+@media(max-width:400px){.stats-row{gap:8px;}.stat-num{font-size:22px;}.main-card{padding:30px 20px;}.hero-headline{font-size:28px;}.cta-btn{padding:20px 20px;}}
+</style>
+</head>
+<body>
+
+<!-- Backgrounds -->
+<div class="bg-layer">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="grid-bg"></div>
+<canvas id="pc"></canvas>
+
+<!-- ══════════════════════════════════════════
+   ALERT BAR — structured with named spans
+   so JS can update text WITHOUT rebuilding innerHTML
+══════════════════════════════════════════ -->
+<div class="alert-bar">
+  <span class="alert-warn">⚠</span>
+  <span id="alertCountSpan">7</span>&nbsp;<span id="alertTextSpan">customers just walked out — and your nearby competitors got their business instead.</span>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <div class="logo-row">
+    <div class="logo-mark">🍽️</div>
+    <div class="logo-text"><span>ScaleWave</span> Feedback AI</div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      Customer Prevention System — For Premium Restaurants
+    </div>
+    <p class="hero-pain">
+      <span class="pain-icon">🚨</span>
+      <span id="heroPainText">Your nearby competitors are stealing your customers through reviews.</span>
+    </p>
+    <h1 class="hero-headline">
+      Stop Losing Customers by <em>Bad Reviews.</em>
+    </h1>
+    <p class="hero-sub">
+      <strong id="heroStrongText">Restaurants nearby are already</strong> boosting their Google ratings and capturing customers you're losing right now.<br/>One bad review can cost you 30 future customers.
+    </p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card amber">
+      <div class="stat-num" id="statCafes">500+</div>
+      <div class="stat-label">Restaurants Using<br/>This System</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-num">68%</div>
+      <div class="stat-label">Unhappy Guests<br/>Never Come Back</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-num">3.2×</div>
+      <div class="stat-label">More Google<br/>Reviews in 30 Days</div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-it-works" style="width:100%;max-width:480px;margin-bottom:20px;opacity:0;animation:fadeUp 0.6s ease 0.42s forwards;">
+    <div class="section-label" style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:16px;display:flex;align-items:center;gap:8px;text-shadow:0 0 10px rgba(255,149,0,0.5);">
+      ⚡ How It Works — 3 Seconds to Understand
+      <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(255,149,0,0.3),transparent);display:block;"></span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:18px 16px;">
+      <div style="text-align:center;flex:1;">
+        <div style="font-size:24px;margin-bottom:6px;">📲</div>
+        <div style="font-size:11px;font-weight:700;color:var(--cream);line-height:1.3;">Customer<br/>scans QR</div>
+      </div>
+      <div style="font-size:18px;color:rgba(255,149,0,0.5);flex-shrink:0;">→</div>
+      <div style="text-align:center;flex:1;">
+        <div style="font-size:24px;margin-bottom:6px;">😊 ⭐</div>
+        <div style="font-size:11px;font-weight:700;color:var(--green-go);line-height:1.3;">Happy?<br/>Google Review</div>
+      </div>
+      <div style="font-size:18px;color:rgba(255,149,0,0.5);flex-shrink:0;">→</div>
+      <div style="text-align:center;flex:1;">
+        <div style="font-size:24px;margin-bottom:6px;">💬 🔒</div>
+        <div style="font-size:11px;font-weight:700;color:var(--blue-trust);line-height:1.3;">Unhappy?<br/>Private Feedback</div>
+      </div>
+    </div>
+    <!-- Competitor psychology line -->
+    <div style="margin-top:12px;text-align:center;font-size:11.5px;color:rgba(255,149,0,0.75);font-weight:500;letter-spacing:0.02em;">
+      🏆 Restaurants nearby are already improving their ratings — and capturing your customers.
+    </div>
+  </div>
+
+  <!-- Demo Card -->
+  <div class="main-card">
+    <div class="section-label">🎯 Live Product Demo — What Your Customers See</div>
+    <span class="preview-icon">🍽️</span>
+    <p class="preview-label" id="previewCafeName">Your Restaurant Name</p>
+    <h2 class="preview-headline">We value your<br/>experience&nbsp;<span class="preview-heart">♥</span></h2>
+    <p class="preview-sub">Every visit matters to us.<br/><strong>How was your experience today?</strong></p>
+    <div class="preview-btns">
+      <div class="pbtn pbtn-happy">
+        <span class="pbtn-emoji">😊</span>
+        <span class="pbtn-labels">
+          <span class="pbl-main" id="happyBtnMain">I'm Happy!</span>
+          <span class="pbl-sub"  id="happyBtnSub">Leave us a Google Review →</span>
+        </span>
+      </div>
+      <div class="pbtn pbtn-unhappy">
+        <span class="pbtn-emoji">💬</span>
+        <span class="pbtn-labels">
+          <span class="pbl-main" id="unhappyBtnMain">Not Satisfied</span>
+          <span class="pbl-sub"  id="unhappyBtnSub">Tell us on WhatsApp →</span>
+        </span>
+      </div>
+    </div>
+    <div class="mini-trust">
+      <div class="mini-trust-item">🔒 <span>Private</span></div>
+      <div class="mini-trust-item">⚡ <span>30 Seconds</span></div>
+      <div class="mini-trust-item">🙏 <span>We Read All</span></div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feature-item">
+      <div class="fi-icon red">🛡️</div>
+      <div class="fi-text">
+        <div class="fi-title">Stops Negative Reviews Before They Go Public</div>
+        <div class="fi-desc">Unhappy guests message you on WhatsApp instead of bombing Google. You fix it privately. Your rating stays protected.</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-icon green">⭐</div>
+      <div class="fi-text">
+        <div class="fi-title">Floods Google With 5-Star Reviews — Automatically</div>
+        <div class="fi-desc">Happy customers are sent straight to your Google page with one tap. Your star rating climbs while you focus on the food.</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-icon amber">💰</div>
+      <div class="fi-text">
+        <div class="fi-title">Protects Revenue & Brings Customers Back</div>
+        <div class="fi-desc">68% of unhappy guests never return — unless you reach them first. This system turns complaints into loyal customers.</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-icon blue">⚡</div>
+      <div class="fi-text">
+        <div class="fi-title">Live in 60 Seconds. No Tech Skills Needed.</div>
+        <div class="fi-desc">Just a QR code. No app, no login for your customers. Works on any phone. Set up in one minute, runs forever.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scarcity Notice -->
+  <div style="width:100%;max-width:480px;margin-top:16px;background:rgba(255,149,0,0.05);border:1px solid rgba(255,149,0,0.20);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;opacity:0;animation:fadeUp 0.6s ease 0.65s forwards;">
+    <span style="font-size:20px;flex-shrink:0;">🔐</span>
+    <p style="font-size:12px;font-weight:500;color:var(--cream-dim);line-height:1.5;"><strong style="color:var(--amber);">Exclusive Access:</strong> We do not offer this to multiple competing restaurants in the same area. Once your competitor claims this for your location — it's theirs.</p>
+  </div>
+
+  <!-- Testimonial 1 -->
+  <div class="testimonial">
+    <div class="testi-stars">★★★★★</div>
+    <p class="testi-quote">"We went from 42 Google reviews to 218 in just 6 weeks. Three unhappy customers messaged us on WhatsApp — we fixed their issues and they came back. This system pays for itself."</p>
+    <div class="testi-author">
+      <div class="testi-avatar">R</div>
+      <div>
+        <div class="testi-name">Rahul Mehra</div>
+        <div class="testi-role">Owner, The Brew Room · Bangalore</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonial 2 -->
+  <div class="testimonial">
+    <div class="testi-stars">★★★★★</div>
+    <p class="testi-quote">"Honestly, when we first installed this system we weren't sure it would actually work. But within 4 weeks our 5-star reviews went up by 30% and all the negative feedback is now coming to us privately on WhatsApp. We fix it before it ever hits Google. Wish we had found this earlier."</p>
+    <div class="testi-author">
+      <div class="testi-avatar">A</div>
+      <div>
+        <div class="testi-name">Amit Sehgal</div>
+        <div class="testi-role">Owner, Spice Garden Restaurant · Delhi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonial 3 -->
+  <div class="testimonial">
+    <div class="testi-stars">★★★★★</div>
+    <p class="testi-quote">"In just 2 months, our customer footfall increased by 35% and our Google ratings are now skyrocketing. People see our 4.9 stars and walk in without even calling. The system basically does the marketing for us — I just focus on the food and my team."</p>
+    <div class="testi-author">
+      <div class="testi-avatar">P</div>
+      <div>
+        <div class="testi-name">Priya Nambiar</div>
+        <div class="testi-role">Co-Owner, The Coastal Table · Mumbai</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <!-- Headline above button -->
+    <div style="margin-bottom:18px;">
+      <div style="font-size:clamp(22px,6vw,28px);font-weight:800;color:#00D084;line-height:1.15;letter-spacing:-0.01em;text-shadow:0 0 24px rgba(0,208,132,0.45);">FREE 10-MINUTE<br/>SCALING GROWTH SESSION</div>
+      <p style="margin-top:10px;font-size:13px;font-weight:400;color:var(--cream-dim);line-height:1.65;">Claim your 100% FREE no-obligation 10-minute scaling growth call. This is strictly for people who are hungry for GROWTH. If that's you, then let's scale your Ratings to the Moon 🚀</p>
+    </div>
+    <a id="ctaBtn" href="https://scalewavetech-create.github.io/Questionnaire-of-Restaurants/" class="cta-btn" target="_blank" rel="noopener">
+      <div class="cta-btn-shine"></div>
+      <span class="cta-btn-text" style="align-items:center;">
+        <span class="cta-btn-main" id="ctaBtnMain">Get Started</span>
+      </span>
+      <span style="font-size:20px;line-height:1;">→</span>
+    </a>
+    <div class="cta-subtext">
+      <span>✅ No obligation</span>
+      <span>✅ 100% Free</span>
+      <span>✅ Limited spots</span>
+    </div>
+  </div>
+
+  <p class="footer"><span>ScaleWave Tech AI</span> &nbsp;·&nbsp; Feedback System v2 &nbsp;·&nbsp; © 2025</p>
+
+</div><!-- /page -->
+
+
+<script>
+/* ─── Live lost-customer counter ─── */
+let lostCount = 7;
+const alertCountEl = document.getElementById("alertCountSpan");
+function tickLost() {
+  if (Math.random() < 0.3) {
+    lostCount++;
+    if (alertCountEl) alertCountEl.textContent = lostCount;
+  }
+  setTimeout(tickLost, 4000 + Math.random() * 8000);
+}
+tickLost();
+
+/* ─── Count-up animation on stats ─── */
+function animateCount(el, target, suffix, duration) {
+  let start = 0;
+  const step = target / (duration / 16);
+  (function tick() {
+    start += step;
+    if (start >= target) { el.textContent = target + suffix; return; }
+    el.textContent = Math.floor(start) + suffix;
+    requestAnimationFrame(tick);
+  })();
+}
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    animateCount(document.getElementById("statCafes"), 500, "+", 1800);
+    observer.disconnect();
+  });
+}, { threshold: 0.5 });
+observer.observe(document.getElementById("statCafes"));
+
+/* ─── Particle system ─── */
+(function(){
+  const canvas = document.getElementById("pc");
+  const ctx    = canvas.getContext("2d");
+  let W, H, pts = [];
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  window.addEventListener("resize", resize);
+  resize();
+  const COLS = ["rgba(255,149,0,","rgba(74,158,255,","rgba(0,208,132,","rgba(255,255,255,"];
+  class P {
+    constructor(){ this.reset(true); }
+    reset(init){
+      this.x  = Math.random() * W;
+      this.y  = init ? Math.random() * H : H + 6;
+      this.r  = Math.random() * 1.2 + 0.2;
+      this.sp = Math.random() * 0.4 + 0.12;
+      this.c  = COLS[Math.floor(Math.random() * COLS.length)];
+      this.a  = Math.random() * 0.45 + 0.08;
+      this.dr = (Math.random() - 0.5) * 0.25;
+      this.tw = Math.random() * Math.PI * 2;
+      this.ts = Math.random() * 0.025 + 0.008;
+    }
+    tick(){
+      this.y -= this.sp; this.x += this.dr; this.tw += this.ts;
+      this.ca = this.a * (0.65 + 0.35 * Math.sin(this.tw));
+      if (this.y < -8) this.reset(false);
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.c + this.ca + ")";
+      ctx.fill();
+    }
+  }
+  for (let i = 0; i < 80; i++) pts.push(new P());
+  (function loop(){
+    ctx.clearRect(0, 0, W, H);
+    pts.forEach(p => { p.tick(); p.draw(); });
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
